@@ -46,6 +46,11 @@ public:
         puts("\ninit done");
     }
 
+    ~AntEnv() {
+        mj_deleteData(d);
+        mj_deleteModel(m);
+    }
+
     void reset() {
         mj_resetData(m, d);
         reset_model();
