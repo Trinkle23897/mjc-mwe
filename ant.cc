@@ -58,8 +58,8 @@ public:
     }
 
     std::vector<mjtNum> get_body_com(std::string name) {
-        // TODO
-        return std::vector<mjtNum>({0, 0});
+        // print(self.data.xpos[1][0], self.data.xpos[1][1])
+        return std::vector<mjtNum>({d->xpos[3], d->xpos[4], d->xpos[5]});
     }
 
     void reset() {
