@@ -7,6 +7,9 @@ class AntEnv {
     mjData *d;
     mjtNum *init_qpos, *init_qvel;
     double reset_noise_scale_, min_contact_force, max_contact_force;
+    double ctrl_cost_weight, contact_cost_weight, healthy_reward;
+    double healthy_z_min, healthy_z_max;
+    int frame_skip;
     char error[1000];
     std::mt19937 gen_;
     std::uniform_real_distribution<> dist_qpos_;
@@ -18,7 +21,10 @@ public:
             m(mj_loadXML(xml, 0, error, 1000)), d(mj_makeData(m)),
             init_qpos(new mjtNum[m->nq]), init_qvel(new mjtNum[m->nv]),
             reset_noise_scale_(0.1), min_contact_force(-1.0),
-            max_contact_force(1.0), gen_(0),
+            max_contact_force(1.0), ctrl_cost_weight(0.5),
+            contact_cost_weight(5e-4), healthy_reward(1.0),
+            healthy_z_min(0.2), healthy_z_max(1.0),
+            frame_skip(5), gen_(0),
             dist_qpos_(-reset_noise_scale_, reset_noise_scale_),
             dist_qvel_(0, 1),
             obs_size(m->nq - 2 + m->nv + 6 * m->nbody),
@@ -51,6 +57,11 @@ public:
         mj_deleteModel(m);
     }
 
+    std::vector<mjtNum> get_body_com(std::string name) {
+        // TODO
+        return std::vector<mjtNum>({0, 0});
+    }
+
     void reset() {
         mj_resetData(m, d);
         reset_model();
@@ -59,6 +70,65 @@ public:
     }
 
     // special for ant
+
+    void step(std::vector<mjtNum> action) {
+        auto xy_before = get_body_com("torso");
+        mjtNum ctrl_cost = 0;
+        for (int i = 0; i < m->nu; ++i) {
+            d->ctrl[i] = action[i];
+            ctrl_cost += ctrl_cost_weight * action[i] * action[i];
+        }
+        for (int i = 0; i < frame_skip; ++i) {
+            mj_step(m, d);
+        }
+        mj_rnePostConstraint(m, d);
+        auto xy_after = get_body_com("torso");
+        mjtNum dt = frame_skip * m->opt.timestep;
+        mjtNum xv = (xy_after[0] - xy_before[0]) / dt;
+        mjtNum yv = (xy_after[1] - xy_before[1]) / dt;
+
+        mjtNum contact_cost = 0;
+        for (int i = 0; i < 6 * m->nbody; ++i) {
+            mjtNum x = d->cfrc_ext[i];
+            x = std::min(max_contact_force, x);
+            x = std::max(min_contact_force, x);
+            contact_cost += contact_cost_weight * x * x;
+        }
+
+        float reward = xv + healthy_reward - ctrl_cost - contact_cost;
+
+        bool done = !is_healthy();
+        printf("done %d reward %f\n", int(done), reward);
+        get_obs();
+        puts("info");
+        printf("reward_forward %f\n", xv);
+        printf("reward_ctrl %f\n", -ctrl_cost);
+        printf("reward_contact %f\n", -contact_cost);
+        printf("reward_survive %f\n", healthy_reward);
+        printf("x_position %f\n", xy_after[0]);
+        printf("y_position %f\n", xy_after[1]);
+        printf("distance_from_origin %f\n", std::sqrt(xy_after[0] * xy_after[0] + xy_after[1] * xy_after[1]));
+        printf("x_velocity %f\n", xv);
+        printf("y_velocity %f\n", yv);
+        printf("forward_reward %f\n", xv);
+    }
+
+    bool is_healthy() {
+        if (healthy_z_min <= d->qpos[2] && d->qpos[2] <= healthy_z_max) {
+            for (int i = 0; i < m->nq; ++i) {
+                if (!std::isfinite(d->qpos[i])) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < m->nv; ++i) {
+                if (!std::isfinite(d->qvel[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
     void reset_model() {
         // noise_low = -self._reset_noise_scale
@@ -114,6 +184,7 @@ public:
             if (i % 6 == 0) puts("");
             printf("%.8f\t", obs_buf[i]);
         }
+        puts("");
     }
 };
 
@@ -122,5 +193,6 @@ int main(int argc, char const *argv[])
 {
     AntEnv e(argv[1]);
     e.reset();
+    e.step(std::vector<mjtNum>({0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01}));
     return 0;
 }
