@@ -100,9 +100,9 @@ class MujocoEnv(gym.Env):
         self._set_observation_space(observation)
 
     def _set_action_space(self):
-        bounds = self.model.actuator_ctrlrange.copy().astype(np.float32)
+        bounds = self.model.actuator_ctrlrange.copy().astype(np.float64)
         low, high = bounds.T
-        self.action_space = spaces.Box(low=low, high=high, dtype=np.float32)
+        self.action_space = spaces.Box(low=low, high=high, dtype=np.float64)
         return self.action_space
 
     def _set_observation_space(self, observation):
