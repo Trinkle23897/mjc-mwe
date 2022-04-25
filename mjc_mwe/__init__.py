@@ -11,7 +11,7 @@ from mjc_mwe.reacher import ReacherEnv
 from mjc_mwe.swimmer import SwimmerEnv
 from mjc_mwe.walker2d import Walker2dEnv
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __all__ = [
     "MujocoEnv",

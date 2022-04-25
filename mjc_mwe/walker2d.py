@@ -1,5 +1,3 @@
-from turtle import distance
-
 import numpy as np
 
 from gym import utils
