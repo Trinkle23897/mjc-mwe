@@ -3,7 +3,7 @@ __credits__ = ["Rushiv Arora"]
 import numpy as np
 
 from gym import utils
-from gym.envs.mujoco import mujoco_env
+from mjc_mwe import mujoco_env
 
 DEFAULT_CAMERA_CONFIG = {}
 

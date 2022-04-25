@@ -1,7 +1,7 @@
 import numpy as np
 
 from gym import utils
-import mujoco_env
+from mjc_mwe import mujoco_env
 
 DEFAULT_CAMERA_CONFIG = {
     "distance": 4.0,
@@ -290,10 +290,9 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         return observation
 
-
-if __name__ == "__main__":
-    np.random.seed(0)
-    env = AntEnv()
-    print(env.reset(seed=0))
-    act = np.zeros(8) + 0.01
-    print(env.step(act))
+    def viewer_setup(self):
+        for key, value in DEFAULT_CAMERA_CONFIG.items():
+            if isinstance(value, np.ndarray):
+                getattr(self.viewer.cam, key)[:] = value
+            else:
+                setattr(self.viewer.cam, key, value)
