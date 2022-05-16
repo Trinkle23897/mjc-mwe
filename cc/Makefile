@@ -7,3 +7,4 @@ COMMON=-O2 -I ./inc -L . -std=c++11 -Wl,-rpath,'$$ORIGIN'
 all:
 	mkdir -p bin
 	$(CXX) $(COMMON) ant.cc -lmujoco -o bin/ant
+	$(CXX) $(COMMON) id2name.cc -lmujoco -o bin/id2name
