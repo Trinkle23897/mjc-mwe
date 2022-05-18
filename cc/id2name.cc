@@ -12,126 +12,51 @@ public:
     {
         assert(m);
         assert(d);
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_UNKNOWN, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_UNKNOWN %d %s\n", i, s);
+
+#define L(attr) \
+        for (int i = 0;; ++i) { \
+            const auto *s = mj_id2name(m, attr, i); \
+            if (s == nullptr) break; \
+            printf(#attr" %d %s\n", i, s); \
         }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_BODY, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_BODY %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_XBODY, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_XBODY %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_JOINT, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_JOINT %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_DOF, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_DOF %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_GEOM, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_GEOM %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_SITE, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_SITE %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_CAMERA, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_CAMERA %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_LIGHT, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_LIGHT %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_MESH, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_MESH %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_SKIN, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_SKIN %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_HFIELD, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_HFIELD %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_TEXTURE, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_TEXTURE %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_MATERIAL, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_MATERIAL %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_PAIR, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_PAIR %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_EXCLUDE, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_EXCLUDE %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_EQUALITY, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_EQUALITY %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_TENDON, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_TENDON %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_ACTUATOR, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_ACTUATOR %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_SENSOR, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_SENSOR %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_NUMERIC, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_NUMERIC %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_TEXT, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_TEXT %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_TUPLE, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_TUPLE %d %s\n", i, s);
-        }
-        for (int i = 0;; ++i) {
-            const auto *s = mj_id2name(m, mjOBJ_KEY, i);
-            if (s == nullptr) break;
-            printf("mjOBJ_KEY %d %s\n", i, s);
-        }
+
+#define P(attr) \
+        printf(#attr": "); \
+        for (int i = 0; i < m->njnt; ++i) { \
+            printf("%d ", m->attr[i]); \
+        } \
+        puts("");
+
+        L(mjOBJ_UNKNOWN)
+        L(mjOBJ_BODY)
+        L(mjOBJ_XBODY)
+        L(mjOBJ_JOINT)
+        L(mjOBJ_DOF)
+        L(mjOBJ_GEOM)
+        L(mjOBJ_SITE)
+        L(mjOBJ_CAMERA)
+        L(mjOBJ_LIGHT)
+        L(mjOBJ_MESH)
+        L(mjOBJ_SKIN)
+        L(mjOBJ_HFIELD)
+        L(mjOBJ_TEXTURE)
+        L(mjOBJ_MATERIAL)
+        L(mjOBJ_PAIR)
+        L(mjOBJ_EXCLUDE)
+        L(mjOBJ_EQUALITY)
+        L(mjOBJ_TENDON)
+        L(mjOBJ_ACTUATOR)
+        L(mjOBJ_SENSOR)
+        L(mjOBJ_NUMERIC)
+        L(mjOBJ_TEXT)
+        L(mjOBJ_TUPLE)
+        L(mjOBJ_KEY)
+
+        P(jnt_type)
+        P(jnt_qposadr)
+        P(jnt_dofadr)
+        P(jnt_bodyid)
+        P(jnt_group)
     }
 
     ~Env() {
