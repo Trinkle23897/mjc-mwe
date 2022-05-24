@@ -101,6 +101,10 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     when using the Ant environment if you would like to report results with contact forces (if
     contact forces are not used in your experiments, you can use version > 2.0).
 
+    **Note:** Ant-v4 has the option of including contact forces in the observation space. To add contact forces set the argument
+    'use_contact_forces" to True. The default value is False. Also note that training including contact forces can perform worse
+    than not using them as shown in (https://github.com/openai/gym/pull/2762).
+
     ### Rewards
     The reward consists of three parts:
     - *survive_reward*: Every timestep that the ant is alive, it gets a reward of 1.
@@ -162,6 +166,7 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self,
         xml_file="ant.xml",
         ctrl_cost_weight=0.5,
+        use_contact_forces=False,
         contact_cost_weight=5e-4,
         healthy_reward=1.0,
         terminate_when_unhealthy=True,
@@ -182,6 +187,8 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self._contact_force_range = contact_force_range
 
         self._reset_noise_scale = reset_noise_scale
+
+        self._use_contact_forces = use_contact_forces
 
         self._exclude_current_positions_from_observation = (
             exclude_current_positions_from_observation
@@ -234,22 +241,18 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
 
-        ctrl_cost = self.control_cost(action)
-        contact_cost = self.contact_cost
-
         forward_reward = x_velocity
         healthy_reward = self.healthy_reward
 
         rewards = forward_reward + healthy_reward
-        costs = ctrl_cost + contact_cost
 
-        reward = rewards - costs
+        costs = ctrl_cost = self.control_cost(action)
+
         done = self.done
         observation = self._get_obs()
         info = {
             "reward_forward": forward_reward,
             "reward_ctrl": -ctrl_cost,
-            "reward_contact": -contact_cost,
             "reward_survive": healthy_reward,
             "x_position": xy_position_after[0],
             "y_position": xy_position_after[1],
@@ -258,20 +261,27 @@ class AntEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             "y_velocity": y_velocity,
             "forward_reward": forward_reward,
         }
+        if self._use_contact_forces:
+            contact_cost = self.contact_cost
+            costs += contact_cost
+            info["reward_ctrl"] = -contact_cost
+
+        reward = rewards - costs
 
         return observation, reward, done, info
 
     def _get_obs(self):
         position = self.data.qpos.flat.copy()
         velocity = self.data.qvel.flat.copy()
-        contact_force = self.contact_forces.flat.copy()
 
         if self._exclude_current_positions_from_observation:
             position = position[2:]
 
-        observations = np.concatenate((position, velocity, contact_force))
-
-        return observations
+        if self._use_contact_forces:
+            contact_force = self.contact_forces.flat.copy()
+            return np.concatenate((position, velocity, contact_force))
+        else:
+            return np.concatenate((position, velocity))
 
     def reset_model(self):
         noise_low = -self._reset_noise_scale
